@@ -1,0 +1,67 @@
+import tkinter as tk
+from tkinter import messagebox
+
+# Fonction pour calculer la moyenne progressive
+def calculer_moyenne():
+    if len(manches) == 1:
+        # Si on n'a qu'une seule manche, la moyenne est égale à cette manche
+        moyenne = manches[0]
+        moyenne_label.config(text=f"Avg spe round: {moyenne:.2f}")
+    elif len(manches) > 1:
+        # La première manche
+        premiere_manche = manches[0]
+        
+        # Calcul des différences entre chaque manche consécutive
+        differences = [manches[i] - manches[i-1] for i in range(1, len(manches))]
+        
+        # Moyenne des différences
+        moyenne_diff = sum(differences) / len(differences)
+        
+        # Moyenne finale = (première manche + moyenne des différences) / nombre de manches
+        moyenne = (premiere_manche + sum(differences)) / (len(differences) + 1)
+        moyenne_label.config(text=f"Avg spe round: {moyenne:.2f}")
+    else:
+        # Si aucune manche n'a été ajoutée
+        moyenne_label.config(text="Avg spe round: 0")
+
+# Fonction pour ajouter une manche
+def ajouter_manche(event=None):  # Ajout de l'argument event pour la gestion de "Entrée"
+    try:
+        manche = int(input_entry.get())  # On récupère le chiffre/nombre entré
+        manches.append(manche)  # On ajoute la manche à la liste
+        input_entry.delete(0, tk.END)  # On vide le champ d'entrée après l'ajout
+        calculer_moyenne()  # On met à jour la moyenne
+    except ValueError:
+        messagebox.showerror("Erreur", "Veuillez entrer un nombre valide.")
+
+# Création de la fenêtre principale pour afficher la moyenne
+app = tk.Tk()
+app.title("Moyenne des manches spéciales")
+app.geometry("300x150")
+app.configure(bg='black')  # Fond noir
+
+# Liste des manches
+manches = []
+
+# Label pour afficher la moyenne
+moyenne_label = tk.Label(app, text="Avg spe round: 0", font=("Helvetica", 16), bg='black', fg='white')
+moyenne_label.pack(pady=20)
+
+# Fenêtre pour l'entrée des manches
+input_window = tk.Toplevel(app)
+input_window.title("Entrer une manche spéciale")
+input_window.geometry("300x150")
+input_window.configure(bg='black')  # Fond noir
+
+# Champ de saisie des manches
+input_entry = tk.Entry(input_window, font=("Helvetica", 14), bg='black', fg='white', insertbackground='white')
+input_entry.pack(pady=20)
+
+# Associer la touche "Entrée" pour ajouter une manche
+input_window.bind('<Return>', ajouter_manche)  # Associer la touche Entrée à la fonction ajouter_manche
+
+# Mettre automatiquement le focus sur la fenêtre d'entrée pour éviter de cliquer
+input_window.focus_force()
+
+# Lancement de l'application
+app.mainloop()
